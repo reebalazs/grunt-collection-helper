@@ -116,7 +116,7 @@ or (a watch rule where adding the lists is demonstrated):
         },
     },
 
-or (an uglify rule, where we use a different mapping format than previously):
+or (an uglify rule, where we use a different src - dest mapping format than previously):
 
     uglify: {
         default: {
@@ -125,8 +125,3 @@ or (an uglify rule, where we use a different mapping format than previously):
                     collect.local('src/scrumptious').select('cakes.js')
         }
     }
-
-
- 
-
-
