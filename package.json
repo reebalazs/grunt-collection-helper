@@ -1,0 +1,28 @@
+{
+    "name": "grunt-collection-helper",
+    "version": "0.0.1",
+    "description": "Helper function to be used with Grunt, for defining resource collections in packages.",
+    "homepage": "https://github.com/reebalazs/buster-collection-helper",
+    "author": {
+        "name": "Balazs Ree"
+    },
+    "contributors": [{
+        "name": "Balazs Ree",
+        "email": "ree@greenfinity.hu",
+        "url": "http://greenfinity.hu"
+    }],
+    "main": "./lib/collection.js",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/reebalazs/grunt-collection-helper.git"
+    },
+    "dependencies": {
+        "grunt": ">= 0.4"
+    },
+    "devDependencies": {
+        "buster": "*"
+    },
+    "scripts": {
+        "test": "node run-tests"
+    }
+}
