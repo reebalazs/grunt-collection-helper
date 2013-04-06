@@ -11,7 +11,7 @@
         "email": "ree@greenfinity.hu",
         "url": "http://greenfinity.hu"
     }],
-    "main": "./lib/collection.js",
+    "main": "./src/collection.js",
     "repository": {
         "type": "git",
         "url": "git://github.com/reebalazs/grunt-collection-helper.git"
