@@ -44,6 +44,20 @@ buster.testCase('grunt-collection-helper', {
                 assert.equals(c.config, {});
             }
         },
+        'path': function () {
+            this.mockFile.expects('readJSON')
+                .atLeast(1);
+            assert.equals(collection.local().collection.path(),
+                '.');
+            assert.equals(collection.local().collection.path('foo.js'),
+                'foo.js');
+            assert.equals(collection.local().collection.path('some/foo.js'),
+                'some/foo.js');
+            assert.equals(collection.local('bar/camp').collection.path('foo.js'),
+                'bar/camp/foo.js');
+            assert.equals(collection.local('bar/camp').collection.path('some/foo.js'),
+                'bar/camp/some/foo.js');
+        },
         'select': {
             'setUp': function () {
                  var config1 = {

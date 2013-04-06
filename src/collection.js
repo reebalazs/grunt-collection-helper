@@ -18,12 +18,15 @@ Collection.prototype = {
         try {
             config = grunt.file.readJSON(jsonPath);
         } catch (e) {
-            grunt.verbose.writeln('Info: Could not read "' + jsonPath + '"');
+            grunt.log.writeln('Info: Could not read "' + jsonPath + '"');
         }
         extend(this.config, config);
     },
 
     path: function(relPath) {
+        if (relPath === undefined) {
+            relPath = '.';
+        }
         return path.join(this.base, relPath);
     },
 
