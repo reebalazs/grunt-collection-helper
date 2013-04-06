@@ -18,7 +18,8 @@ Collection.prototype = {
         try {
             config = grunt.file.readJSON(jsonPath);
         } catch (e) {
-            grunt.log.writeln('Info: Could not read "' + jsonPath + '"');
+            // XXX ... it looks like verbose never gets logged, not even with -v
+            grunt.verbose.writeln('Info: Could not read "' + jsonPath + '"');
         }
         extend(this.config, config);
     },
