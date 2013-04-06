@@ -27,7 +27,15 @@ Collection.prototype = {
         if (relPath === undefined) {
             relPath = '.';
         }
-        return path.join(this.base, relPath);
+        var splitPath = relPath.split(':');
+        if (splitPath.length > 1) {
+            // switch to a different component,
+            // if path was in format locator:parm1[:...]:filepath
+            var target = module.exports[splitPath[0]].apply(null, splitPath.slice(1));
+            return target.path(splitPath[splitPath.length - 1]);
+        } else {
+            return path.join(this.base, relPath);
+        }
     },
 
     select: function(key) {
@@ -62,6 +70,10 @@ function BaseLocator() {
 BaseLocator.prototype = {
     constructor: BaseLocator,
     Collection: Collection,
+
+    path: function() {
+        return this.collection.path.apply(this.collection, arguments);
+    },
 
     select: function() {
         return this.collection.select.apply(this.collection, arguments);
@@ -117,7 +129,7 @@ BowerCollection.prototype._makeBowerConfig = function() {
     //
     var jsonPath = this.path('component.json');
     var config = grunt.file.readJSON(jsonPath);
-    var main = config.main;
+    var main = config.main || [];
     if (typeof main == 'string') {
         main = [main];
     }
@@ -133,6 +145,8 @@ function BowerLocator() {
 }
 util.inherits(BowerLocator, BaseLocator);
 BowerLocator.prototype.constructor = BowerLocator;
+BowerLocator.prototype.Collection = BowerCollection;
+
 
 BowerLocator.prototype.getBase = function(pkgName) {
     // Bower's packages are under components/${pkgName}
