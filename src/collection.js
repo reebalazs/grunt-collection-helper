@@ -33,7 +33,8 @@ Collection.prototype = {
         if (splitPath.length > 1) {
             // switch to a different component,
             // if path was in format locator:parm1[:...]:filepath
-            var target = module.exports[splitPath[0]].apply(null, splitPath.slice(1, -1));
+            var target = module.exports[splitPath[0]].apply(module.exports,
+                splitPath.slice(1, -1));
             return target.path(splitPath[splitPath.length - 1]);
         } else {
             return path.join(this.base, splitPath[0]);
