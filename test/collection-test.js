@@ -6,6 +6,10 @@ var collection = require('../src/collection.js');
 
 buster.testCase('grunt-collection-helper', {
 
+    setUp: function () {
+        collection._cache = {local: {}, bower: {}};
+    },
+
     'Collection': {
         setUp: function () {
             this.mockFile = this.mock(grunt.file);
@@ -93,5 +97,52 @@ buster.testCase('grunt-collection-helper', {
                 }, 'Error');
             }
         }
+    },
+
+    'local': {
+        'is cached': function () {
+            var mockFile = this.mock(grunt.file);
+            mockFile.expects('readJSON').exactly(3);
+            var c1 = collection.local();
+            var c2 = collection.local();
+            assert.same(c1, c2);
+            var c3 = collection.local('foo');
+            var c4 = collection.local('foo');
+            assert.same(c3, c4);
+            refute.same(c1, c3);
+            var c5 = collection.local('bar');
+            var c6 = collection.local('bar');
+            assert.same(c5, c6);
+            refute.same(c1, c5);
+            refute.same(c3, c5);
+        }
+    },
+
+    'bower': {
+        'is cached': function () {
+            var mockFile = this.mock(grunt.file);
+            mockFile.expects('readJSON')
+                .withArgs('components/foo/component.json')
+                .returns({});
+            mockFile.expects('readJSON')
+                .withArgs('components/foo/collection.json');
+            mockFile.expects('readJSON')
+                .withArgs('components/bar/component.json')
+                .returns({});
+            mockFile.expects('readJSON')
+                .withArgs('components/bar/collection.json');
+            mockFile.expects('readJSON')
+                .withArgs('foo/collection.json');
+            var c1 = collection.bower('foo');
+            var c2 = collection.bower('foo');
+            assert.same(c1, c2);
+            var c3 = collection.bower('bar');
+            var c4 = collection.bower('bar');
+            assert.same(c3, c4);
+            refute.same(c1, c3);
+            var c5 = collection.local('foo');
+            refute.same(c1, c5);
+        }
     }
+
 });

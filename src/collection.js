@@ -160,17 +160,24 @@ module.exports = {
 
     name: 'grunt-collection-helper',
 
+    _cache: {local: {}, bower: {}},
+
     select: function () {
         var locator = this.local();
         return locator.select.apply(locator, arguments);
     },
 
     local: function (/*optional*/ base) {
-        return new LocalLocator(base);
+        var key = base || '.';
+        var result = this._cache.local[key] =
+            this._cache.local[key] || new LocalLocator(base);
+        return result;
     },
 
     bower: function (pkgName) {
-        return new BowerLocator(pkgName);
+        var result = this._cache.bower[pkgName] =
+            this._cache.bower[pkgName] || new BowerLocator(pkgName);
+        return result;
     }
 
 };
