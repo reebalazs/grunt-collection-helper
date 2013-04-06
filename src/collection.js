@@ -24,18 +24,19 @@ Collection.prototype = {
         extend(this.config, config);
     },
 
-    path: function(relPath) {
-        if (relPath === undefined) {
-            relPath = '.';
+    path: function(splitPath) {
+        if (splitPath === undefined) {
+            splitPath = ['.'];
+        } else if (! Array.isArray(splitPath)) {
+            splitPath = [splitPath];
         }
-        var splitPath = relPath.split(':');
         if (splitPath.length > 1) {
             // switch to a different component,
             // if path was in format locator:parm1[:...]:filepath
-            var target = module.exports[splitPath[0]].apply(null, splitPath.slice(1));
+            var target = module.exports[splitPath[0]].apply(null, splitPath.slice(1, -1));
             return target.path(splitPath[splitPath.length - 1]);
         } else {
-            return path.join(this.base, relPath);
+            return path.join(this.base, splitPath[0]);
         }
     },
 
@@ -148,7 +149,6 @@ util.inherits(BowerLocator, BaseLocator);
 BowerLocator.prototype.constructor = BowerLocator;
 BowerLocator.prototype.Collection = BowerCollection;
 
-
 BowerLocator.prototype.getBase = function(pkgName) {
     // Bower's packages are under components/${pkgName}
     var base = path.join('components', pkgName);
@@ -159,6 +159,11 @@ BowerLocator.prototype.getBase = function(pkgName) {
 module.exports = {
 
     name: 'grunt-collection-helper',
+
+    select: function () {
+        var locator = this.local();
+        return locator.select.apply(locator, arguments);
+    },
 
     local: function (/*optional*/ base) {
         return new LocalLocator(base);
