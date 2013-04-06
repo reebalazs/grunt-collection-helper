@@ -13,14 +13,18 @@ Collection.prototype = {
     constructor: Collection,
 
     _makeConfig: function() {
-        this.jsonPath = path.join(this.base, 'collection.json');
+        var jsonPath = this.path('collection.json');
         var config = {};
         try {
-            config = grunt.file.readJSON(this.jsonPath);
+            config = grunt.file.readJSON(jsonPath);
         } catch (e) {
-            grunt.log.writeln('Info: Could not read "' + this.jsonPath + '"');
+            grunt.verbose.writeln('Info: Could not read "' + jsonPath + '"');
         }
         extend(this.config, config);
+    },
+
+    path: function(relPath) {
+        return path.join(this.base, relPath);
     },
 
     select: function(key) {
@@ -28,16 +32,16 @@ Collection.prototype = {
             var config = this.config[key];
             if (config === undefined) {
                 throw new Error('Bad config, no such key "' + key +
-                    '" in file "' + this.jsonPath + '".');
+                    '" in configuration.');
             }
             if (! Array.isArray(config)) {
                 throw new Error('Bad config, value must be an array for key "' + key +
-                    '" in file "' + this.jsonPath + '".');
+                    '" in configuration.');
             }
             // paths relative from json file path
             var result = [];
             for (var i = 0; i < config.length; i++) {
-                result.push(path.join(this.base, config[i]));
+                result.push(this.path(config[i]));
             }
             return result;
         } else {
@@ -108,7 +112,7 @@ BowerCollection.prototype._makeBowerConfig = function() {
     //       'tree/orange.js'],       'orange.js': ['tree/orange.js']}
     //
     //
-    var jsonPath = path.join(this.base, 'component.json');
+    var jsonPath = this.path('component.json');
     var config = grunt.file.readJSON(jsonPath);
     var main = config.main;
     if (typeof main == 'string') {
