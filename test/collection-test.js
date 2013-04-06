@@ -3,8 +3,13 @@ var buster = require("buster");
 
 buster.testCase('foo', {
 
-    'bar': function () {
-        assert(true);
+    'Collection': {
+        setUp: function () {
+            console.log('HERE');
+        },
+        'first': function () {
+            assert(true);
+        }
     }
 
 });
