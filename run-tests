@@ -1,4 +1,4 @@
 #!/usr/bin/env node
 
-require('./lib/collection');
+require('./src/collection');
 require('./test/collection-test');
