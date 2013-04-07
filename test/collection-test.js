@@ -144,7 +144,42 @@ buster.testCase('grunt-collection-helper', {
             refute.same(c1, c3);
             var c5 = collection.local('foo');
             refute.same(c1, c5);
+        },
+
+        'walks up on directory tree': function () {
+            var mockFile = this.mock(grunt.file);
+            mockFile.expects('exists')
+                .withArgs('.').returns(true);
+            mockFile.expects('exists')
+                .withArgs('components').returns(false); // no
+            mockFile.expects('exists')
+                .withArgs('..').returns(true);
+            mockFile.expects('exists')
+                .withArgs('../components').returns(false); // no
+            mockFile.expects('exists')
+                .withArgs('../..').returns(true);
+            mockFile.expects('exists')
+                .withArgs('../../components').returns(true); // yes, found
+            // now expect to read the package config
+            var config1 = {'a.js': ['a1.js', 'a2.js']};
+            mockFile.expects('readJSON')
+                .withArgs('../../components/foo/collection.json').returns(config1);
+            mockFile.expects('readJSON')
+                .withArgs('../../components/foo/component.json').returns({});
+
+            var c1 = collection.bower('foo');
+            assert.equals(c1.base, '../../components/foo');
+            assert.equals(c1.collection.config, config1);
+        },
+
+        '//stops at the top of the tree, error if components are not found at all': function () {
+
+        },
+
+        '//gives error if component.json does not exist in package root': function () {
+
         }
+
     }
 
 });
