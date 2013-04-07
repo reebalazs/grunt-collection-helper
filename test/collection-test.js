@@ -166,7 +166,7 @@ buster.testCase('grunt-collection-helper', {
                 .withArgs('../../components/foo/collection.json').returns(config1);
             mockFile.expects('readJSON')
                 .withArgs('../../components/foo/component.json').returns({});
-
+            //
             var c1 = collection.bower('foo');
             assert.equals(c1.base, '../../components/foo');
             assert.equals(c1.collection.config, config1);
