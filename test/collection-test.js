@@ -115,7 +115,22 @@ buster.testCase('grunt-collection-helper', {
             assert.same(c5, c6);
             refute.same(c1, c5);
             refute.same(c3, c5);
+        },
+
+        'collection.json is optional': function () {
+            var mockFile = this.mock(grunt.file);
+            mockFile.expects('exists')
+                .withArgs('.').returns(true);
+            mockFile.expects('exists')
+                .withArgs('components').returns(true);
+            mockFile.expects('readJSON')
+                .withArgs('components/foo/component.json').returns({});
+            mockFile.expects('readJSON')
+                .withArgs('components/foo/collection.json').throws();
+            //
+            var c1 = collection.bower('foo');
         }
+
     },
 
     'bower': {
@@ -134,7 +149,7 @@ buster.testCase('grunt-collection-helper', {
             mockFile.expects('exists')
                 .withArgs('.').returns(true);
             mockFile.expects('exists')
-                .withArgs('components').returns(true);
+                .withArgs('components').returns(true); // location is only checked once (cached)
             var c1 = collection.bower('foo');
             var c2 = collection.bower('foo');
             assert.same(c1, c2);
@@ -190,8 +205,57 @@ buster.testCase('grunt-collection-helper', {
             }, 'Error');
         },
 
-        '//gives error if component.json does not exist in package root': function () {
+        'gives error if component.json does not exist in package root': function () {
+            var mockFile = this.mock(grunt.file);
+            mockFile.expects('exists')
+                .withArgs('.').returns(true);
+            mockFile.expects('exists')
+                .withArgs('components').returns(true);
+            mockFile.expects('readJSON')
+                .withArgs('components/foo/component.json').throws();
+            //
+            assert.exception(function () {
+                collection.bower('foo');
+            }, 'Error');
 
+        },
+
+        'collection.json is optional': function () {
+            var mockFile = this.mock(grunt.file);
+            mockFile.expects('exists')
+                .withArgs('.').returns(true);
+            mockFile.expects('exists')
+                .withArgs('components').returns(true);
+            mockFile.expects('readJSON')
+                .withArgs('components/foo/component.json').returns({});
+            mockFile.expects('readJSON')
+                .withArgs('components/foo/collection.json').throws();
+            //
+            var c1 = collection.bower('foo');
+        },
+
+        'merges main attribute from components.json': function () {
+            var mockFile = this.mock(grunt.file);
+            mockFile.expects('exists')
+                .withArgs('.').returns(true);
+            mockFile.expects('exists')
+                .withArgs('components').returns(true);
+            mockFile.expects('readJSON')
+                .withArgs('components/foo/component.json')
+                .returns({main: ['a.js', 'amain.css', 'bmain.css']});
+            mockFile.expects('readJSON')
+                .withArgs('components/foo/collection.json').returns({
+                    'a.js': ['a1.js', 'a2.js'],
+                    'b.js': ['b1.js', 'b2.js']
+                });
+            //
+            var c1 = collection.bower('foo');
+            assert.equals(c1.collection.config, {
+                'a.js': ['a1.js', 'a2.js'],
+                'b.js': [ 'b1.js', 'b2.js' ],
+                'amain.css': ['amain.css'],
+                'bmain.css': ['bmain.css']
+            });
         }
 
     }
