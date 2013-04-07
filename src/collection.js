@@ -150,10 +150,42 @@ util.inherits(BowerLocator, BaseLocator);
 BowerLocator.prototype.constructor = BowerLocator;
 BowerLocator.prototype.Collection = BowerCollection;
 
-BowerLocator.prototype.getBase = function(pkgName) {
+BowerLocator.prototype.getBase = function(pkgName, /*optional*/ cache) {
+    if (cache === undefined) {
+        // This will mean no cache since the dict will be private.
+        cache = {};
+    }
+    this.cache = cache;
+    var components = this.getComponents();
     // Bower's packages are under components/${pkgName}
-    var base = path.join('components', pkgName);
+    var base = path.join(components, pkgName);
     return base;
+};
+
+BowerLocator.prototype.getComponents = function() {
+    // Components directory is cached.
+    var components = this.cache.components;
+    if (this.cache.components === undefined) {
+        // Find it
+        var here = '.';
+        var found;
+        while (grunt.file.exists(here)) {
+            // Is there a components directory?
+            components = path.join(here, 'components');
+            if (grunt.file.exists(components)) {
+                found = true;
+                break;
+            }
+            // Walk up on the directory chain
+            here = path.join(here, '..');
+        }
+        if (! found) {
+            grunt.fail.fatal('Bower components not found.');
+        }
+        grunt.verbose.writeln('Found Bower components directory: "'+ components + '".');
+        this.cache.components = components;
+    }
+    return components;
 };
 
 
@@ -176,8 +208,12 @@ module.exports = {
     },
 
     bower: function (pkgName) {
-        var result = this._cache.bower[pkgName] =
-            this._cache.bower[pkgName] || new BowerLocator(pkgName);
+        this._cache.bower.packages = this._cache.bower.packages || {};
+        var result = this._cache.bower.packages[pkgName];
+        if (result === undefined) {
+            result = this._cache.bower.packages[pkgName] =
+                new BowerLocator(pkgName, this._cache.bower);
+        }
         return result;
     }
 

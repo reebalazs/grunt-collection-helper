@@ -122,17 +122,19 @@ buster.testCase('grunt-collection-helper', {
         'is cached': function () {
             var mockFile = this.mock(grunt.file);
             mockFile.expects('readJSON')
-                .withArgs('components/foo/component.json')
-                .returns({});
+                .withArgs('components/foo/component.json').returns({});
             mockFile.expects('readJSON')
                 .withArgs('components/foo/collection.json');
             mockFile.expects('readJSON')
-                .withArgs('components/bar/component.json')
-                .returns({});
+                .withArgs('components/bar/component.json').returns({});
             mockFile.expects('readJSON')
                 .withArgs('components/bar/collection.json');
             mockFile.expects('readJSON')
                 .withArgs('foo/collection.json');
+            mockFile.expects('exists')
+                .withArgs('.').returns(true);
+            mockFile.expects('exists')
+                .withArgs('components').returns(true);
             var c1 = collection.bower('foo');
             var c2 = collection.bower('foo');
             assert.same(c1, c2);
