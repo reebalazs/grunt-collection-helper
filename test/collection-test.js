@@ -172,8 +172,22 @@ buster.testCase('grunt-collection-helper', {
             assert.equals(c1.collection.config, config1);
         },
 
-        '//stops at the top of the tree, error if components are not found at all': function () {
-
+        'stops at the top of the tree, error if components are not found at all': function () {
+            var mockFile = this.mock(grunt.file);
+            mockFile.expects('exists')
+                .withArgs('.').returns(true);
+            mockFile.expects('exists')
+                .withArgs('components').returns(false); // no
+            mockFile.expects('exists')
+                .withArgs('..').returns(true);
+            mockFile.expects('exists')
+                .withArgs('../components').returns(false); // no
+            mockFile.expects('exists')
+                .withArgs('../..').throws();
+            //
+            assert.exception(function () {
+                collection.bower('foo');
+            }, 'Error');
         },
 
         '//gives error if component.json does not exist in package root': function () {
