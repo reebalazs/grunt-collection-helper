@@ -1,4 +1,6 @@
 
+[![Build Status](https://travis-ci.org/reebalazs/grunt-collection-helper.png)](https://travis-ci.org/reebalazs/grunt-collection-helper)
+
 
 # grunt-collection-helper #
 
