@@ -30,7 +30,7 @@ provided `collection.js` defines a list of resources for `full.js`:
     }
 
 The `collection.json` can be provided locally, or originated from
-a packae installed by a supported packaging / installation method.
+a package installed by a supported packaging / installation method.
 
 
 ## Goals ##
@@ -40,13 +40,13 @@ a packae installed by a supported packaging / installation method.
 
 - provides a simple API usable from a `Gruntfile.js` script,
   to select the list of resources from the above files by their name.
+  The resulting resource lists can be used:
 
-  The resulting resource lists
+  * with any grunt task and file mapping format
 
-  * can be freely used, as the collection helper does not support their
-    way of usage, it merely provides the lists themselves
-
-  * can be used with any grunt task and file mapping format
+  * in a flexible way, as the collection helper does not
+    support or dictate their way of usage, it merely provides
+    the lists themselves
 
 - can support multiple packaging / installation methods via its 'locators'
   
@@ -67,7 +67,7 @@ way you have installed grunt packages from. Normally, put something like
 the following into the `package.json` next to the `Gruntfile.js` where you
 want to use the collection helper from:
 
-   "devDependencies": {
+    "devDependencies": {
         "grunt": ">=0.4",
         ...
         "grunt-collection-helper": "*"
@@ -108,8 +108,8 @@ same directory where our
 simple content:
 
     {
-        'flower.js': ['js/rose.js', 'js/bluebell.js'],
-        'fruit.css': ['css/apple.css',  'css/orange.css']
+        "flower.js": ["js/rose.js", "js/bluebell.js"],
+        "fruit.css": ["css/apple.css", "css/orange.css"]
     }
 
 This describes the construction order for `flower.js` and `fruit.css` resources.
@@ -121,13 +121,13 @@ and receive the list of the files associated with this name. After this,
 the script will process this list according to the way it needs to.
 
 
-### Locators ###
+## Locators ##
 
 The resources are always selected relatively to their 'package root',
 depending the installation method. The collection helper provides 'locators'
 to find the root of a given package. 
 
-### The local() locator ###
+### The local() locator ####
 
 The following expressions will select the construction order for the specified resource:
 
@@ -140,8 +140,8 @@ A path parameter can be specified to `local`, where a `collection.json` file
 will be read from. For example, `src/scrumptious/collection.json` could contain:
 
     {
-        'cakes.js': ['js/dobos.js', 'js/tiramisu.js'],
-        'nuts.css': ['css/almond.css',  'css/chestnut.css']
+        "cakes.js": ["js/dobos.js", "js/tiramisu.js"],
+        "nuts.css": ["css/almond.css",  "css/chestnut.css"]
     }
 
 This would make the following expressions work:
@@ -248,7 +248,33 @@ parametrizing the selection could also be supported:
         // uses a function from collection.js
 
 
-## Using the expressions from the Gruntfile.js ##
+## Composition of lists with collection.json ##
+
+Let us extend our `collection.json` as follows:
+
+    {
+        "flower.js": ["js/rose.js", "js/bluebell.js"],
+        "fruit.css": ["css/apple.css",  "css/orange.css"],
+        "dist.js": [
+            ["bower", "jquery", "jquery.js"],
+            ["bower", "bootstrap", "docs/assets/js/bootstrap.js"]
+        ]
+    }
+
+If the resource is represented by an array instead of a string, then
+the first parameter will select a locator, which will receice the rest
+of the parameter except the last one. The last parameter will be used
+to select the path of the resource relative inside the package.
+
+For example, `["bower", "jquery", "jquery.js"]`
+will be translated to `bower('jquery').path('jquery.js')`.
+
+    collect.select('dist.js')
+            //=> ['./components/jquery/jquery.js',
+            //    './components/bootstrap/docs/assets/js/bootstrap.js']
+
+
+## Example usage from the Gruntfile.js ##
 
 As the select function returns just normal arrays, it can be used with any
 grunt plugin, and in various combinations, from `Gruntfile.js`. Consider the
@@ -307,6 +333,19 @@ or (an uglify rule, where we use a different src - dest mapping format than prev
         }
     }
 
-## Composition of lists with collection.json ##
 
-XXX
+or (to see composition of lists at work, with our extended `collection.json`):
+
+    uglify: {
+        default: {
+            dest: 'dist/full.min.js',
+            src: collect.select('dist.js')
+        }
+    },
+    watch: {
+        'default': {
+            files: collect.select('dist.js'),
+            tasks: ['uglify:default']
+        },
+    }
+
