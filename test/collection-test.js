@@ -242,22 +242,46 @@ buster.testCase('grunt-collection-helper', {
                 .withArgs('components').returns(true);
             mockFile.expects('readJSON')
                 .withArgs('components/foo/component.json')
-                .returns({main: ['a.js', 'amain.css', 'bmain.css']});
+                .returns({main: ['a1.js', 'a2.js',
+                        'c1.css', 'c2.css', 'm.less']});
             mockFile.expects('readJSON')
                 .withArgs('components/foo/collection.json').returns({
-                    'a.js': ['a1.js', 'a2.js'],
-                    'b.js': ['b1.js', 'b2.js']
+                    'x.js': ['x1.js', 'x2.js']
                 });
             //
             var c1 = collection.bower('foo');
             assert.equals(c1.collection.config, {
-                'a.js': ['a1.js', 'a2.js'],
-                'b.js': [ 'b1.js', 'b2.js' ],
-                'amain.css': ['amain.css'],
-                'bmain.css': ['bmain.css']
+                 'x.js': ['x1.js', 'x2.js'],
+                'main.js': ['a1.js', 'a2.js'],
+                'main.css': ['c1.css', 'c2.css'],
+                'main.less': ['m.less']
+            });
+        },
+
+       'attributes from components.json take precedent over main': function () {
+            var mockFile = this.mock(grunt.file);
+            mockFile.expects('exists')
+                .withArgs('.').returns(true);
+            mockFile.expects('exists')
+                .withArgs('components').returns(true);
+            mockFile.expects('readJSON')
+                .withArgs('components/foo/component.json')
+                .returns({main: ['a1.js', 'a2.js',
+                        'c1.css', 'c2.css', 'm.less']});
+            mockFile.expects('readJSON')
+                .withArgs('components/foo/collection.json').returns({
+                    'x.js': ['x1.js', 'x2.js'],
+                    'main.css': ['somethingelse.css']
+                });
+            //
+            var c1 = collection.bower('foo');
+            assert.equals(c1.collection.config, {
+                 'x.js': ['x1.js', 'x2.js'],
+                'main.js': ['a1.js', 'a2.js'],
+                'main.css': ['somethingelse.css'],   // <=
+                'main.less': ['m.less']
             });
         }
-
     }
 
 });

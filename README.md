@@ -199,16 +199,7 @@ up to the parent folders, in the above example it was found in the
 same directory where `Gruntfile.js` resides.
 
 
-### Other locators ###
-
-It is extendable. We can easily create a `jamjs`, ... locator.
-
-A locator can accept any number of parameters.
-
-
-## Future plans ##
-
-### Using main property from bower's component.json ###
+#### Using main property from bower's component.json ####
 
 In addition to a composition order given in `component.json`,
 the `main` property of Bower's `component.json` can also be used.
@@ -232,6 +223,15 @@ by file extension.
 The keys in `collection.json` will take precedent: if it already defines
 a `main.js`, it will win over the `main` value from `component.json`.
 
+
+### Other locators ###
+
+It is extendable. We can easily create a `jamjs`, ... locator.
+
+A locator can accept any number of parameters.
+
+
+## Future plans ##
 
 ### Consider settings from .bowerrc in finding the components directory ###
 

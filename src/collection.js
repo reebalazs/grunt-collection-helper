@@ -117,18 +117,23 @@ BowerCollection.prototype._makeConfig = function() {
 
 BowerCollection.prototype._makeBowerConfig = function() {
     //
-    // The main option in component.json will be used
-    // as single additional resources
+    // The 'main' property in component.json will be used
+    // to select additional resources. Lists of collections
+    // are grouped according to file extension, and stored
+    // in keys 'main.<EXT>'.
     // 
     // e.g.
     // 
     // component.json:                generates into collection.js:
     // 
-    // main: 'single.js',        =>   {'single.js': ['single.js']}
+    // main: 'single.js',        =>   {'main.js': ['single.js']}
     // 
-    // main: ['apple.js',        =>   {'apple.js': ['apple.js'],
-    //       'tree/orange.js'],       'orange.js': ['tree/orange.js']}
+    // main: ['apple.js',        =>   {'main.js': ['apple.js', 'tree/orange.js']}
+    //        'tree/orange.js']
     //
+    // main: ['apple.js',        =>   {'main.js': ['apple.js', 'tree/orange.js'],
+    //        'tree/orange.js',        'main.css': ['cucumber.css']}
+    //         'cucumber.css']
     //
     var jsonPath = this.path('component.json');
     var config = grunt.file.readJSON(jsonPath);
@@ -139,7 +144,10 @@ BowerCollection.prototype._makeBowerConfig = function() {
     for (var i = 0; i < main.length; i++) {
         var full = main[i];
         var base = path.basename(full);
-        this.config[base] = [full];
+        var ext = path.extname(base);
+        var key = 'main' + ext;
+        var resList = this.config[key] = this.config[key] || [];
+        resList.push(full);
     }
 };
 
