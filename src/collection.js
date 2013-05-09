@@ -135,8 +135,15 @@ BowerCollection.prototype._makeBowerConfig = function() {
     //        'tree/orange.js',        'main.css': ['cucumber.css']}
     //         'cucumber.css']
     //
-    var jsonPath = this.path('component.json');
-    var config = grunt.file.readJSON(jsonPath);
+    var jsonPath = this.path('bower.json');
+    var config;
+    try {
+        config = grunt.file.readJSON(jsonPath);
+    } catch (e) {
+        // fall back to deprecated configuration file
+        jsonPath = this.path('component.json');
+        config = grunt.file.readJSON(jsonPath);
+    }
     var main = config.main || [];
     if (typeof main == 'string') {
         main = [main];

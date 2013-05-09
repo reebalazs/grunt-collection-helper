@@ -1,6 +1,6 @@
 {
     "name": "grunt-collection-helper",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Helper function to be used with Grunt, for defining resource collections in packages.",
     "homepage": "https://github.com/reebalazs/grunt-collection-helper",
     "author": {
