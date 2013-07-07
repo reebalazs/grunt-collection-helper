@@ -185,7 +185,13 @@ BowerLocator.prototype.getComponents = function() {
         var here = '.';
         var found;
         while (grunt.file.exists(here)) {
-            // Is there a components directory?
+            // Is there a bower_components directory?
+            components = path.join(here, 'bower_components');
+            if (grunt.file.exists(components)) {
+                found = true;
+                break;
+            }
+            // Is there a components directory? (obsolete)
             components = path.join(here, 'components');
             if (grunt.file.exists(components)) {
                 found = true;
