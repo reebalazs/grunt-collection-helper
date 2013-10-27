@@ -122,11 +122,11 @@ buster.testCase('grunt-collection-helper', {
             mockFile.expects('exists')
                 .withArgs('.').returns(true);
             mockFile.expects('exists')
-                .withArgs('components').returns(true);
+                .withArgs('bower_components').returns(true);
             mockFile.expects('readJSON')
-                .withArgs('components/foo/component.json').returns({});
+                .withArgs('bower_components/foo/bower.json').returns({});
             mockFile.expects('readJSON')
-                .withArgs('components/foo/collection.json').throws();
+                .withArgs('bower_components/foo/collection.json').throws();
             //
             var c1 = collection.bower('foo');
         },
@@ -154,19 +154,19 @@ buster.testCase('grunt-collection-helper', {
         'is cached': function () {
             var mockFile = this.mock(grunt.file);
             mockFile.expects('readJSON')
-                .withArgs('components/foo/component.json').returns({});
+                .withArgs('bower_components/foo/bower.json').returns({});
             mockFile.expects('readJSON')
-                .withArgs('components/foo/collection.json');
+                .withArgs('bower_components/foo/collection.json');
             mockFile.expects('readJSON')
-                .withArgs('components/bar/component.json').returns({});
+                .withArgs('bower_components/bar/bower.json').returns({});
             mockFile.expects('readJSON')
-                .withArgs('components/bar/collection.json');
+                .withArgs('bower_components/bar/collection.json');
             mockFile.expects('readJSON')
                 .withArgs('foo/collection.json');
             mockFile.expects('exists')
                 .withArgs('.').returns(true);
             mockFile.expects('exists')
-                .withArgs('components').returns(true); // location is only checked once (cached)
+                .withArgs('bower_components').returns(true); // location is only checked once (cached)
             var c1 = collection.bower('foo');
             var c2 = collection.bower('foo');
             assert.same(c1, c2);
@@ -183,35 +183,43 @@ buster.testCase('grunt-collection-helper', {
             mockFile.expects('exists')
                 .withArgs('.').returns(true);
             mockFile.expects('exists')
+                .withArgs('bower_components').returns(false); // no
+            mockFile.expects('exists')
                 .withArgs('components').returns(false); // no
             mockFile.expects('exists')
                 .withArgs('..').returns(true);
+            mockFile.expects('exists')
+                .withArgs('../bower_components').returns(false); // no
             mockFile.expects('exists')
                 .withArgs('../components').returns(false); // no
             mockFile.expects('exists')
                 .withArgs('../..').returns(true);
             mockFile.expects('exists')
-                .withArgs('../../components').returns(true); // yes, found
+                .withArgs('../../bower_components').returns(true); // yes, found
             // now expect to read the package config
             var config1 = {'a.js': ['a1.js', 'a2.js']};
             mockFile.expects('readJSON')
-                .withArgs('../../components/foo/collection.json').returns(config1);
+                .withArgs('../../bower_components/foo/collection.json').returns(config1);
             mockFile.expects('readJSON')
-                .withArgs('../../components/foo/component.json').returns({});
+                .withArgs('../../bower_components/foo/bower.json').returns({});
             //
             var c1 = collection.bower('foo');
-            assert.equals(c1.base, '../../components/foo');
+            assert.equals(c1.base, '../../bower_components/foo');
             assert.equals(c1.collection.config, config1);
         },
 
-        'stops at the top of the tree, error if components are not found at all': function () {
+        'stops at the top of the tree, error if bower_components are not found at all': function () {
             var mockFile = this.mock(grunt.file);
             mockFile.expects('exists')
                 .withArgs('.').returns(true);
             mockFile.expects('exists')
+                .withArgs('bower_components').returns(false); // no
+            mockFile.expects('exists')
                 .withArgs('components').returns(false); // no
             mockFile.expects('exists')
                 .withArgs('..').returns(true);
+            mockFile.expects('exists')
+                .withArgs('../bower_components').returns(false); // no
             mockFile.expects('exists')
                 .withArgs('../components').returns(false); // no
             mockFile.expects('exists')
@@ -222,18 +230,20 @@ buster.testCase('grunt-collection-helper', {
             }, 'Error');
         },
 
-        'gives error if component.json does not exist in package root': function () {
+        'does not give error if bower.json does not exist in package root': function () {
             var mockFile = this.mock(grunt.file);
             mockFile.expects('exists')
                 .withArgs('.').returns(true);
             mockFile.expects('exists')
-                .withArgs('components').returns(true);
+                .withArgs('bower_components').returns(true);
             mockFile.expects('readJSON')
-                .withArgs('components/foo/component.json').throws();
+                .withArgs('bower_components/foo/bower.json').throws();
+            mockFile.expects('readJSON')
+                .withArgs('bower_components/foo/component.json').throws();
+            mockFile.expects('readJSON')
+                .withArgs('bower_components/foo/collection.json').throws();
             //
-            assert.exception(function () {
-                collection.bower('foo');
-            }, 'Error');
+            collection.bower('foo');
 
         },
 
@@ -242,27 +252,27 @@ buster.testCase('grunt-collection-helper', {
             mockFile.expects('exists')
                 .withArgs('.').returns(true);
             mockFile.expects('exists')
-                .withArgs('components').returns(true);
+                .withArgs('bower_components').returns(true);
             mockFile.expects('readJSON')
-                .withArgs('components/foo/component.json').returns({});
+                .withArgs('bower_components/foo/bower.json').returns({});
             mockFile.expects('readJSON')
-                .withArgs('components/foo/collection.json').throws();
+                .withArgs('bower_components/foo/collection.json').throws();
             //
             var c1 = collection.bower('foo');
         },
 
-        'merges main attribute from components.json': function () {
+        'merges main attribute from bower.json': function () {
             var mockFile = this.mock(grunt.file);
             mockFile.expects('exists')
                 .withArgs('.').returns(true);
             mockFile.expects('exists')
-                .withArgs('components').returns(true);
+                .withArgs('bower_components').returns(true);
             mockFile.expects('readJSON')
-                .withArgs('components/foo/component.json')
+                .withArgs('bower_components/foo/bower.json')
                 .returns({main: ['a1.js', 'a2.js',
                         'c1.css', 'c2.css', 'm.less']});
             mockFile.expects('readJSON')
-                .withArgs('components/foo/collection.json').returns({
+                .withArgs('bower_components/foo/collection.json').returns({
                     'x.js': ['x1.js', 'x2.js']
                 });
             //
@@ -280,13 +290,13 @@ buster.testCase('grunt-collection-helper', {
             mockFile.expects('exists')
                 .withArgs('.').returns(true);
             mockFile.expects('exists')
-                .withArgs('components').returns(true);
+                .withArgs('bower_components').returns(true);
             mockFile.expects('readJSON')
-                .withArgs('components/foo/component.json')
+                .withArgs('bower_components/foo/bower.json')
                 .returns({main: ['a1.js', 'a2.js',
                         'c1.css', 'c2.css', 'm.less']});
             mockFile.expects('readJSON')
-                .withArgs('components/foo/collection.json').returns({
+                .withArgs('bower_components/foo/collection.json').returns({
                     'x.js': ['x1.js', 'x2.js'],
                     'main.css': ['somethingelse.css']
                 });
