@@ -142,7 +142,11 @@ BowerCollection.prototype._makeBowerConfig = function() {
     } catch (e) {
         // fall back to deprecated configuration file
         jsonPath = this.path('component.json');
-        config = grunt.file.readJSON(jsonPath);
+        try {
+            config = grunt.file.readJSON(jsonPath);
+        } catch (exp) {
+            config = {};
+        }
     }
     var main = config.main || [];
     if (typeof main == 'string') {

@@ -129,7 +129,24 @@ buster.testCase('grunt-collection-helper', {
                 .withArgs('components/foo/collection.json').throws();
             //
             var c1 = collection.bower('foo');
+        },
+
+        'component.json + bower.json is optional too': function () {
+            var mockFile = this.mock(grunt.file);
+            mockFile.expects('exists')
+                .withArgs('.').returns(true);
+            mockFile.expects('exists')
+                .withArgs('bower_components').returns(true);
+            mockFile.expects('readJSON')
+                .withArgs('bower_components/foo/component.json').throws();
+            mockFile.expects('readJSON')
+                .withArgs('bower_components/foo/bower.json').throws();
+            mockFile.expects('readJSON')
+                .withArgs('bower_components/foo/collection.json').throws();
+            //
+            var c1 = collection.bower('foo');
         }
+
 
     },
 
